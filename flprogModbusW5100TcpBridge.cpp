@@ -64,3 +64,8 @@ void ModbusBridgeW5100TCPDevice::restartServer(bool mode)
     }
     connect(mode);
 }
+
+void ModbusBridgeW5100TCPDevice::print(String data)
+{
+    client.print(data);
+}

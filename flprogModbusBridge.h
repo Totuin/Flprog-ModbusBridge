@@ -15,6 +15,7 @@ public:
     bool setPort(int port);
     virtual void restartServer(bool mode){};
     bool setRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth);
+    virtual void print(String data);
 
 protected:
     int tcpPort = 502;
@@ -55,7 +56,7 @@ private:
 class ModbusBridge
 {
 public:
-    void pool();
+    virtual void pool();
     void setTCPDevice(ModbusBridgeTCPDevice *device);
     void setRTUDevice(ModbusBridgeRTUDevice *device);
     void setTCPPort(int port);
@@ -66,28 +67,67 @@ public:
     void setRtuPortParity(byte stopBits);
     void byServer();
     void byClient();
-    void begin();
+    virtual void begin();
 
 protected:
-private:
-    void tcpPool();
-    void rtuPool();
+    virtual void tcpPool(){};
+    virtual void rtuPool();
     void sendRTUBuffer();
     void getRTURxBuffer();
-    void sendTCPBuffer();
+    virtual void sendTCPBuffer(){};
     void onPeDePin();
     void offPeDePin();
     void setPinPeDe(byte pin);
+    ModbusBridgeTCPDevice *tcpDevice;
+    ModbusBridgeRTUDevice *rtuDevice;
+    bool isServer = true;
     byte pinPeDe = 200;
     byte bufferSize = 0;
-    byte mbapBuffer[6];
     byte buffer[64];
     byte lastRec = 0;
     byte workStatus = MODBUS_READY;
     unsigned long startT35;
-    ModbusBridgeTCPDevice *tcpDevice;
-    ModbusBridgeRTUDevice *rtuDevice;
     unsigned long startSendTime;
     int timeOfSend;
-    bool isServer = true;
+
+private:
+};
+
+class ModbusTcpBridge : public ModbusBridge
+{
+protected:
+    virtual void tcpPool();
+    virtual void sendTCPBuffer();
+
+private:
+    byte mbapBuffer[6];
+};
+
+class ModbusRtuOverTcpBridge : public ModbusBridge
+{
+protected:
+    virtual void tcpPool();
+    virtual void sendTCPBuffer();
+
+private:
+};
+
+class ModbusKasCadaCloudTcpBridge : public ModbusBridge
+{
+public:
+    virtual void pool();
+    void setKaScadaCloudIp(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet);
+    void setKaScadaCloudPort(int port);
+    void setKaScadaCloudDevceId(String id);
+    virtual void begin();
+
+protected:
+    virtual void tcpPool();
+    virtual void sendTCPBuffer();
+
+private:
+    byte mbapBuffer[6];
+    String deniceId;
+    unsigned long kaScadaCloudTimeStartTime;
+    
 };

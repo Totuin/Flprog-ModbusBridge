@@ -14,11 +14,10 @@ public:
     virtual void stop();
     virtual void connect(bool mode);
     virtual byte write(byte buffer[], byte size);
-     virtual void restartServer(bool mode);
+    virtual void restartServer(bool mode);
+    virtual void print(String data);
 
 protected:
-   
-
 private:
     EthernetServer *server;
     EthernetClient client;
