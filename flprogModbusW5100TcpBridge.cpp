@@ -1,9 +1,12 @@
 #include "flprogModbusW5100TcpBridge.h"
 
-void ModbusBridgeW5100TCPDevice::begin()
+void ModbusBridgeW5100TCPDevice::begin(bool mode)
 {
-    server = new EthernetServer(tcpPort);
-    server->begin();
+    if (mode)
+    {
+        server = new EthernetServer(tcpPort);
+        server->begin();
+    }
 }
 
 byte ModbusBridgeW5100TCPDevice::available()
@@ -31,11 +34,18 @@ void ModbusBridgeW5100TCPDevice::stop()
     client.stop();
 }
 
-void ModbusBridgeW5100TCPDevice::connect()
+void ModbusBridgeW5100TCPDevice::connect(bool mode)
 {
     if (!client.connected())
     {
-        client = server->available();
+        if (mode)
+        {
+            client = server->available();
+        }
+        else
+        {
+            client.connect(IPAddress(ipFirst, ipSecond, ipThird, ipFourth), tcpPort);
+        }
     }
 }
 
@@ -44,10 +54,13 @@ byte ModbusBridgeW5100TCPDevice::write(byte buffer[], byte size)
     return client.write(buffer, size);
 }
 
-void ModbusBridgeW5100TCPDevice::restartServer()
+void ModbusBridgeW5100TCPDevice::restartServer(bool mode)
 {
     stop();
-    server = new EthernetServer(tcpPort);
-    server->begin();
-    connect();
+    if (mode)
+    {
+        server = new EthernetServer(tcpPort);
+        server->begin();
+    }
+    connect(mode);
 }

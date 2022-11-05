@@ -82,15 +82,50 @@ long ModbusBridgeRTUDevice::timeForSendbytes(byte bufferSize)
 }
 
 // ModbusBridgeTCPDevice****************
-void ModbusBridgeTCPDevice::setPort(int port)
+bool ModbusBridgeTCPDevice::setPort(int port)
 {
     if (port == tcpPort)
     {
-        return;
+        return false;
     }
 
     tcpPort = port;
-    restartServer();
+    return true;
+}
+
+bool ModbusBridgeTCPDevice::setRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth)
+{
+
+    if (compareRemoteIp(ipFirst, ipSecond, ipThird, ipFourth))
+    {
+        return false;
+    }
+    this->ipFirst = ipFirst;
+    this->ipSecond = ipSecond;
+    this->ipThird = ipThird;
+    this->ipFourth = ipFourth;
+    return true;
+}
+
+bool ModbusBridgeTCPDevice::compareRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth)
+{
+    if (this->ipFirst != ipFirst)
+    {
+        return false;
+    }
+    if (this->ipSecond != ipSecond)
+    {
+        return false;
+    }
+    if (this->ipThird != ipThird)
+    {
+        return false;
+    }
+    if (this->ipFourth != ipFourth)
+    {
+        return false;
+    }
+    return true;
 }
 
 // ModbusBridge******************
@@ -106,13 +141,22 @@ void ModbusBridge::setRTUDevice(ModbusBridgeRTUDevice *device)
 
 void ModbusBridge::pool()
 {
-    tcpPool();
-    rtuPool();
+    if (isServer)
+    {
+        tcpPool();
+        rtuPool();
+    }
+    else
+    {
+
+        rtuPool();
+        tcpPool();
+    }
 }
 
 void ModbusBridge::tcpPool()
 {
-    tcpDevice->connect();
+    tcpDevice->connect(isServer);
 
     if (!tcpDevice->connected())
     {
@@ -188,6 +232,7 @@ void ModbusBridge::getRTURxBuffer()
 
 void ModbusBridge::sendTCPBuffer()
 {
+    tcpDevice->connect(isServer);
     if (!tcpDevice->connected())
     {
         return;
@@ -247,12 +292,16 @@ void ModbusBridge::begin()
         pinMode(pinPeDe, OUTPUT);
         digitalWrite(pinPeDe, LOW);
     }
-    tcpDevice->begin();
+    tcpDevice->begin(isServer);
 }
 
 void ModbusBridge::setTCPPort(int port)
 {
-    tcpDevice->setPort(port);
+    if (!(tcpDevice->setPort(port)))
+    {
+        return;
+    }
+    tcpDevice->restartServer(isServer);
 }
 
 void ModbusBridge::setRtuPortSpeed(byte speed)
@@ -273,4 +322,33 @@ void ModbusBridge::setRtuPortStopBits(byte stopBits)
 void ModbusBridge::setRtuPortParity(byte stopBits)
 {
     rtuDevice->setPortParity(stopBits);
+}
+
+void ModbusBridge::byServer()
+{
+    if (isServer == true)
+    {
+        return;
+    }
+    isServer = true;
+    tcpDevice->restartServer(isServer);
+}
+
+void ModbusBridge::byClient()
+{
+    if (isServer == false)
+    {
+        return;
+    }
+    isServer = false;
+    tcpDevice->restartServer(isServer);
+}
+
+void ModbusBridge::setTCPRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth)
+{
+    if (!tcpDevice->setRemoteIp(ipFirst, ipSecond, ipThird, ipFourth))
+    {
+        return;
+    }
+    tcpDevice->restartServer(isServer);
 }

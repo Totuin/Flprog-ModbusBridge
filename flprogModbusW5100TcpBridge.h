@@ -7,16 +7,17 @@
 class ModbusBridgeW5100TCPDevice : public ModbusBridgeTCPDevice
 {
 public:
-    virtual void begin();
+    virtual void begin(bool mode);
     virtual byte available();
     virtual byte read();
     virtual bool connected();
     virtual void stop();
-    virtual void connect();
+    virtual void connect(bool mode);
     virtual byte write(byte buffer[], byte size);
+     virtual void restartServer(bool mode);
 
 protected:
-    virtual void restartServer();
+   
 
 private:
     EthernetServer *server;

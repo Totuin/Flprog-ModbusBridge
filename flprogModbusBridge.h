@@ -5,20 +5,26 @@
 class ModbusBridgeTCPDevice
 {
 public:
-    virtual void begin(){};
+    virtual void begin(bool mode){};
     virtual byte available() { return 0; };
     virtual byte read() { return 0; };
     virtual bool connected() { return false; };
     virtual void stop(){};
-    virtual void connect(){};
+    virtual void connect(bool mode){};
     virtual byte write(byte buffer[], byte size) { return 0; };
-    void setPort(int port);
+    bool setPort(int port);
+    virtual void restartServer(bool mode){};
+    bool setRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth);
 
 protected:
     int tcpPort = 502;
-    virtual void restartServer(){};
+    byte ipFirst;
+    byte ipSecond;
+    byte ipThird;
+    byte ipFourth;
 
 private:
+    bool compareRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth);
 };
 
 class ModbusBridgeRTUDevice
@@ -53,10 +59,13 @@ public:
     void setTCPDevice(ModbusBridgeTCPDevice *device);
     void setRTUDevice(ModbusBridgeRTUDevice *device);
     void setTCPPort(int port);
+    void setTCPRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth);
     void setRtuPortSpeed(byte speed);
     void setRtuPortDataBits(byte dataBits);
     void setRtuPortStopBits(byte stopBits);
     void setRtuPortParity(byte stopBits);
+    void byServer();
+    void byClient();
     void begin();
 
 protected:
@@ -80,4 +89,5 @@ private:
     ModbusBridgeRTUDevice *rtuDevice;
     unsigned long startSendTime;
     int timeOfSend;
+    bool isServer = true;
 };
