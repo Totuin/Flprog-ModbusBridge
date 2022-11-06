@@ -1,11 +1,13 @@
 #pragma once
 #include "Arduino.h"
-#ifndef ESP32
+#ifdef ESP8266
 #include "flprogModbusBridge.h"
-#include "Ethernet.h"
-#include "SPI.h"
 
-class ModbusBridgeW5100TCPDevice : public ModbusBridgeTCPDevice
+#include <ESP8266WiFi.h>
+
+
+
+class ModbusBridgeESP8266TCPDevice : public ModbusBridgeTCPDevice
 {
 public:
     virtual void begin(bool mode);
@@ -20,8 +22,8 @@ public:
 
 protected:
 private:
-    EthernetServer *server;
-    EthernetClient client;
+    WiFiServer *server;
+    WiFiClient client;
 };
 
 #endif

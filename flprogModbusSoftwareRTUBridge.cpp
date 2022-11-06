@@ -1,5 +1,6 @@
 #include "flprogModbusSoftwareRTUBridge.h"
 
+#ifndef ESP32
 ModbusBridgeSoftwareRTUDevice::ModbusBridgeSoftwareRTUDevice(uint8_t receivePin, uint8_t transmitPin)
 {
     port = new SoftwareSerial(receivePin, transmitPin);
@@ -36,3 +37,5 @@ void ModbusBridgeSoftwareRTUDevice::restartPort()
     port->end();
     port->begin(flprog::speedFromCode(portSpeed));
 }
+
+#endif

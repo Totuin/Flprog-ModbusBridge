@@ -20,6 +20,4 @@ protected:
 private:
     SoftwareSerial *port;
 };
-
-
 #endif

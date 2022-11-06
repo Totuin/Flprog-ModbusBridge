@@ -1,16 +1,15 @@
-#include "flprogModbusW5100TcpBridge.h"
-
-#ifndef ESP32
-void ModbusBridgeW5100TCPDevice::begin(bool mode)
+#include "flprogModbusESP32TcpBridge.h"
+#ifdef ESP32
+void ModbusBridgeESP32TCPDevice::begin(bool mode)
 {
     if (mode)
     {
-        server = new EthernetServer(tcpPort);
+        server = new WiFiServer(tcpPort);
         server->begin();
     }
 }
 
-byte ModbusBridgeW5100TCPDevice::available()
+byte ModbusBridgeESP32TCPDevice::available()
 {
     if (!client.connected())
     {
@@ -19,23 +18,23 @@ byte ModbusBridgeW5100TCPDevice::available()
     return client.available();
 }
 
-byte ModbusBridgeW5100TCPDevice::read()
+byte ModbusBridgeESP32TCPDevice::read()
 {
 
     return client.read();
 }
 
-bool ModbusBridgeW5100TCPDevice::connected()
+bool ModbusBridgeESP32TCPDevice::connected()
 {
     return client.connected();
 }
 
-void ModbusBridgeW5100TCPDevice::stop()
+void ModbusBridgeESP32TCPDevice::stop()
 {
     client.stop();
 }
 
-void ModbusBridgeW5100TCPDevice::connect(bool mode)
+void ModbusBridgeESP32TCPDevice::connect(bool mode)
 {
     if (!client.connected())
     {
@@ -50,23 +49,23 @@ void ModbusBridgeW5100TCPDevice::connect(bool mode)
     }
 }
 
-byte ModbusBridgeW5100TCPDevice::write(byte buffer[], byte size)
+byte ModbusBridgeESP32TCPDevice::write(byte buffer[], byte size)
 {
     return client.write(buffer, size);
 }
 
-void ModbusBridgeW5100TCPDevice::restartServer(bool mode)
+void ModbusBridgeESP32TCPDevice::restartServer(bool mode)
 {
     stop();
     if (mode)
     {
-        server = new EthernetServer(tcpPort);
+        server = new WiFiServer(tcpPort);
         server->begin();
     }
     connect(mode);
 }
 
-void ModbusBridgeW5100TCPDevice::print(String data)
+void ModbusBridgeESP32TCPDevice::print(String data)
 {
     client.print(data);
 }
