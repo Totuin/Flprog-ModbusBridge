@@ -34,10 +34,12 @@ public:
     virtual byte available() { return 0; };
     virtual byte read() { return 0; };
     virtual byte write(byte buffer[], byte size) { return 0; };
+
     virtual void begin(){};
     long t35TimeForSpeed();
     long timeForSendbytes(byte bufferSize);
     void setPortSpeed(byte speed);
+    byte getPortSpeed() { return portSpeed; };
     void setPortDataBits(byte dataBits);
     void setPortStopBits(byte stopBits);
     void setPortParity(byte stopBits);
@@ -62,6 +64,7 @@ public:
     void setTCPPort(int port);
     void setTCPRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth);
     void setRtuPortSpeed(byte speed);
+    byte getRtuPortSpeed();
     void setRtuPortDataBits(byte dataBits);
     void setRtuPortStopBits(byte stopBits);
     void setRtuPortParity(byte stopBits);
@@ -129,5 +132,4 @@ private:
     byte mbapBuffer[6];
     String deniceId;
     unsigned long kaScadaCloudTimeStartTime;
-    
 };

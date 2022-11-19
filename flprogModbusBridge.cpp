@@ -134,6 +134,11 @@ void ModbusBridge::setTCPDevice(ModbusBridgeTCPDevice *device)
     tcpDevice = device;
 }
 
+byte ModbusBridge::getRtuPortSpeed()
+{
+    return rtuDevice->getPortSpeed();
+}
+
 void ModbusBridge::setRTUDevice(ModbusBridgeRTUDevice *device)
 {
     rtuDevice = device;
