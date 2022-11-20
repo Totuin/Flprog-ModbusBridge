@@ -1,0 +1,30 @@
+ModbusTcpBridge	KEYWORD1
+ModbusBridgeHardwareRTUDevice	KEYWORD1
+ModbusBridgeW5100TCPDevice	KEYWORD1
+ModbusKasCadaCloudTcpBridge	KEYWORD1
+ModbusBridgeHardwareRTUDevice	KEYWORD1
+ModbusBridgeESP32TCPDevice	KEYWORD1
+ModbusBridgeESP8266TCPDevice	KEYWORD1
+ModbusBridgeSoftwareRTUDevice	KEYWORD1
+ModbusRtuOverTcpBridge	KEYWORD1
+
+setTCPDevice	KEYWORD2
+setRTUDevice	KEYWORD2
+setTCPPort	KEYWORD2
+setTCPRemoteIp	KEYWORD2
+setRtuPortSpeed	KEYWORD2
+getRtuPortSpeed	KEYWORD2
+setRtuPortDataBits	KEYWORD2
+setRtuPortStopBits	KEYWORD2
+setRtuPortParity	KEYWORD2
+setPinPeDe	KEYWORD2
+byServer	KEYWORD2
+byClient	KEYWORD2
+setKaScadaCloudIp	KEYWORD2
+setKaScadaCloudPort	KEYWORD2
+setKaScadaCloudDevceId	KEYWORD2
+
+getRtuPortDataBits	KEYWORD2
+getRtuPortStopBits	KEYWORD2
+getRtuPortParity	KEYWORD2
+

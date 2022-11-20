@@ -41,8 +41,11 @@ public:
     void setPortSpeed(byte speed);
     byte getPortSpeed() { return portSpeed; };
     void setPortDataBits(byte dataBits);
+    byte getPortDataBits() { return portDataBits; };
     void setPortStopBits(byte stopBits);
+    byte getPortStopBits() { return portStopBits; };
     void setPortParity(byte stopBits);
+    byte getPortParity() { return portParity; };
 
 protected:
     virtual bool hasPort() { return false; };
@@ -64,10 +67,14 @@ public:
     void setTCPPort(int port);
     void setTCPRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth);
     void setRtuPortSpeed(byte speed);
-    byte getRtuPortSpeed();
+    byte getRtuPortSpeed() { return rtuDevice->getPortSpeed(); };
     void setRtuPortDataBits(byte dataBits);
+    byte getRtuPortDataBits() { return rtuDevice->getPortDataBits(); };
     void setRtuPortStopBits(byte stopBits);
+    byte getRtuPortStopBits() { return rtuDevice->getPortStopBits(); };
     void setRtuPortParity(byte stopBits);
+    byte getRtuPortParity() { return rtuDevice->getPortParity(); };
+    void setPinPeDe(byte pin);
     void byServer();
     void byClient();
     virtual void begin();
@@ -80,7 +87,6 @@ protected:
     virtual void sendTCPBuffer(){};
     void onPeDePin();
     void offPeDePin();
-    void setPinPeDe(byte pin);
     ModbusBridgeTCPDevice *tcpDevice;
     ModbusBridgeRTUDevice *rtuDevice;
     bool isServer = true;
