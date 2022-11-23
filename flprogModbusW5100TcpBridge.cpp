@@ -63,7 +63,6 @@ void ModbusBridgeW5100TCPDevice::restartServer(bool mode)
         server = new EthernetServer(tcpPort);
         server->begin();
     }
-    connect(mode);
 }
 
 void ModbusBridgeW5100TCPDevice::print(String data)

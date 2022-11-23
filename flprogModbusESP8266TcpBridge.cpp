@@ -3,11 +3,7 @@
 #ifdef ESP8266
 void ModbusBridgeESP8266TCPDevice::begin(bool mode)
 {
-    if (mode)
-    {
-        server = new WiFiServer(tcpPort);
-        server->begin();
-    }
+    restartServer(mode);
 }
 
 byte ModbusBridgeESP8266TCPDevice::available()
@@ -45,6 +41,7 @@ void ModbusBridgeESP8266TCPDevice::connect(bool mode)
         }
         else
         {
+
             client.connect(IPAddress(ipFirst, ipSecond, ipThird, ipFourth), tcpPort);
         }
     }
@@ -58,12 +55,15 @@ byte ModbusBridgeESP8266TCPDevice::write(byte buffer[], byte size)
 void ModbusBridgeESP8266TCPDevice::restartServer(bool mode)
 {
     stop();
+    if (server)
+    {
+        server->stop();
+    }
     if (mode)
     {
         server = new WiFiServer(tcpPort);
         server->begin();
     }
-    connect(mode);
 }
 
 void ModbusBridgeESP8266TCPDevice::print(String data)

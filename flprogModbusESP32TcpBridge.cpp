@@ -2,11 +2,7 @@
 #ifdef ESP32
 void ModbusBridgeESP32TCPDevice::begin(bool mode)
 {
-    if (mode)
-    {
-        server = new WiFiServer(tcpPort);
-        server->begin();
-    }
+    restartServer(mode);
 }
 
 byte ModbusBridgeESP32TCPDevice::available()
@@ -57,12 +53,15 @@ byte ModbusBridgeESP32TCPDevice::write(byte buffer[], byte size)
 void ModbusBridgeESP32TCPDevice::restartServer(bool mode)
 {
     stop();
+    if (server)
+    {
+        server->stop();
+    }
     if (mode)
     {
         server = new WiFiServer(tcpPort);
         server->begin();
     }
-    connect(mode);
 }
 
 void ModbusBridgeESP32TCPDevice::print(String data)
