@@ -7,6 +7,9 @@ class ModbusBridgeHardwareRTUDevice : public ModbusBridgeRTUDevice
 {
 public:
     ModbusBridgeHardwareRTUDevice(HardwareSerial *port);
+    #if defined(_STM32_DEF_) &&  defined(USBCON) && defined(USBD_USE_CDC)
+    ModbusBridgeHardwareRTUDevice(USBSerial *port);
+    #endif
     virtual void begin();
     virtual byte available();
     virtual byte read();
@@ -17,5 +20,9 @@ protected:
     virtual void restartPort();
 
 private:
+#if defined(_STM32_DEF_) &&  defined(USBCON) && defined(USBD_USE_CDC)
+    bool isUSB = false;
+    USBSerial *usbPort;
+#endif
     HardwareSerial *port;
 };
