@@ -1,4 +1,4 @@
-#include "flprogModbusHardwareRTUBridge.h"
+
 #include "flprogModbusESP8266TcpBridge.h"
 #include "flprogModbusBridge.h"
 
@@ -22,7 +22,7 @@ uint8_t ESPControllerWifiClient_mac[6] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
 
 ModbusKasCadaCloudTcpBridge _Bridge;
 
-ModbusBridgeHardwareRTUDevice RtuDevice(&Serial);
+FLProgUart RtuDevice(&Serial);
 
 ModbusBridgeESP8266TCPDevice TcpDevice;
 

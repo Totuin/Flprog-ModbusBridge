@@ -1,4 +1,4 @@
-#include "flprogModbusSoftwareRTUBridge.h"
+
 #include "flprogModbusW5100TcpBridge.h"
 #include "flprogModbusBridge.h"
 
@@ -8,9 +8,9 @@ byte ethernet_dns [] = {192, 168, 0, 1};
 byte ethernet_gateway [] = {192, 168, 0, 1};
 byte ethernet_subnet [] = {255, 255, 255, 0};
 
-ModbusKasCadaCloudTcpBridge _Bridge;
+ModbusRtuOverTcpBridge _Bridge;
 
-ModbusBridgeSoftwareRTUDevice RtuDevice(2, 3);
+FLProgSoftwareUart RtuDevice(2,3);
 
 ModbusBridgeW5100TCPDevice TcpDevice;
 
@@ -21,14 +21,15 @@ void setup() {
 
   _Bridge.setRTUDevice(&RtuDevice);
   _Bridge.setTCPDevice(&TcpDevice);
-  _Bridge.setKaScadaCloudIp(94, 250, 249, 225);
-  _Bridge.setKaScadaCloudPort(25000);
-  _Bridge.setKaScadaCloudDevceId("DKK6T9TPE4");
+  _Bridge.byClient();
+  _Bridge.setTCPRemoteIp(192, 168,0,100);
   _Bridge.begin();
+
 }
 
 void loop() {
   _Bridge.pool();
 
+  _Bridge.setTCPPort(505);
 
 }

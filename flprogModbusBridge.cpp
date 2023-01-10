@@ -1,87 +1,5 @@
 #include "flprogModbusBridge.h"
 
-// ModbusBridgeRTUDevice************
-void ModbusBridgeRTUDevice::setPortSpeed(byte speed)
-{
-    if (portSpeed == speed)
-    {
-        return;
-    }
-    portSpeed = speed;
-    if (!hasPort())
-    {
-        return;
-    }
-    restartPort();
-}
-
-void ModbusBridgeRTUDevice::setPortDataBits(byte dataBits)
-{
-    if ((dataBits < 5) || (dataBits > 8))
-    {
-        return;
-    }
-    if (portDataBits == dataBits)
-    {
-        return;
-    }
-    portDataBits = dataBits;
-    if (!hasPort())
-    {
-        return;
-    }
-    restartPort();
-}
-
-void ModbusBridgeRTUDevice::setPortStopBits(byte stopBits)
-{
-    if ((stopBits < 1) || (stopBits > 2))
-    {
-        return;
-    }
-
-    if (portStopBits == stopBits)
-    {
-        return;
-    }
-    portStopBits = stopBits;
-    if (!hasPort())
-    {
-        return;
-    }
-    restartPort();
-}
-
-void ModbusBridgeRTUDevice::setPortParity(byte parity)
-{
-    if ((parity < 0) || (parity > 2))
-    {
-        return;
-    }
-
-    if (portParity == parity)
-    {
-        return;
-    }
-    portParity = parity;
-    if (!hasPort())
-    {
-        return;
-    }
-    restartPort();
-}
-
-long ModbusBridgeRTUDevice::t35TimeForSpeed()
-{
-    return flprogModus::t35TimeForSpeed(portSpeed);
-}
-
-long ModbusBridgeRTUDevice::timeForSendbytes(byte bufferSize)
-{
-    return flprogModus::timeForSendBytes(portDataBits, portStopBits, portParity, portSpeed, bufferSize);
-}
-
-// ModbusBridgeTCPDevice****************
 bool ModbusBridgeTCPDevice::setPort(int port)
 {
     if (port == tcpPort)
@@ -134,7 +52,7 @@ void ModbusBridge::setTCPDevice(ModbusBridgeTCPDevice *device)
     tcpDevice = device;
 }
 
-void ModbusBridge::setRTUDevice(ModbusBridgeRTUDevice *device)
+void ModbusBridge::setRTUDevice(FLProgUart *device)
 {
     rtuDevice = device;
 }
@@ -174,10 +92,15 @@ void ModbusBridge::sendRTUBuffer()
     buffer[bufferSize] = crc & 0x00ff;
     bufferSize++;
     rtuDevice->write(buffer, bufferSize);
-    timeOfSend = rtuDevice->timeForSendbytes(bufferSize);
+    timeOfSend = timeForSendbytes(bufferSize);
     startSendTime = millis();
     workStatus = MODBUS_WAITING_SENDING;
     bufferSize = 0;
+}
+
+long ModbusBridge::timeForSendbytes(byte bufferSize)
+{
+    return flprogModus::timeForSendBytes((rtuDevice->getPortDataBits()), (rtuDevice->getPortStopBits()), (rtuDevice->getPortParity()), (rtuDevice->getPortSpeed()), bufferSize);
 }
 
 void ModbusBridge::setPinPeDe(byte pin)
@@ -296,7 +219,7 @@ void ModbusBridge::rtuPool()
         startT35 = millis();
         return;
     }
-    if (!(flprog::isTimer(startT35, (rtuDevice->t35TimeForSpeed()))))
+    if (!(flprog::isTimer(startT35, (t35TimeForSpeed()))))
         return;
     lastRec = 0;
     getRTURxBuffer();
@@ -305,6 +228,11 @@ void ModbusBridge::rtuPool()
         return;
     }
     sendTCPBuffer();
+}
+
+long ModbusBridge::t35TimeForSpeed()
+{
+    return flprogModus::t35TimeForSpeed(rtuDevice->getPortSpeed());
 }
 
 // ModbusTcpBridge******

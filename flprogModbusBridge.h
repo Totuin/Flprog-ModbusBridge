@@ -28,42 +28,12 @@ private:
     bool compareRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth);
 };
 
-class ModbusBridgeRTUDevice
-{
-public:
-    virtual byte available() { return 0; };
-    virtual byte read() { return 0; };
-    virtual byte write(byte buffer[], byte size) { return 0; };
-
-    virtual void begin(){};
-    long t35TimeForSpeed();
-    long timeForSendbytes(byte bufferSize);
-    void setPortSpeed(byte speed);
-    byte getPortSpeed() { return portSpeed; };
-    void setPortDataBits(byte dataBits);
-    byte getPortDataBits() { return portDataBits; };
-    void setPortStopBits(byte stopBits);
-    byte getPortStopBits() { return portStopBits; };
-    void setPortParity(byte stopBits);
-    byte getPortParity() { return portParity; };
-
-protected:
-    virtual bool hasPort() { return false; };
-    virtual void restartPort(){};
-    byte portSpeed = SPEED_9600;
-    byte portDataBits = 8;
-    byte portParity = 0;
-    byte portStopBits = 1;
-
-private:
-};
-
 class ModbusBridge
 {
 public:
     virtual void pool();
     void setTCPDevice(ModbusBridgeTCPDevice *device);
-    void setRTUDevice(ModbusBridgeRTUDevice *device);
+    void setRTUDevice(FLProgUart *device);
     void setTCPPort(int port);
     void setTCPRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth);
     void setRtuPortSpeed(byte speed);
@@ -80,6 +50,8 @@ public:
     virtual void begin();
 
 protected:
+    long t35TimeForSpeed();
+    long timeForSendbytes(byte bufferSize);
     virtual void tcpPool(){};
     virtual void rtuPool();
     void sendRTUBuffer();
@@ -88,7 +60,7 @@ protected:
     void onPeDePin();
     void offPeDePin();
     ModbusBridgeTCPDevice *tcpDevice;
-    ModbusBridgeRTUDevice *rtuDevice;
+    FLProgUart *rtuDevice;
     bool isServer = true;
     byte pinPeDe = 200;
     byte bufferSize = 0;

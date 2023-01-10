@@ -1,4 +1,3 @@
-#include "flprogModbusSoftwareRTUBridge.h"
 #include "flprogModbusW5100TcpBridge.h"
 #include "flprogModbusBridge.h"
 
@@ -10,7 +9,7 @@ byte ethernet_subnet [] = {255, 255, 255, 0};
 
 ModbusRtuOverTcpBridge _Bridge;
 
-ModbusBridgeSoftwareRTUDevice RtuDevice(2, 3);
+FLProgSoftwareUart RtuDevice(2,3);
 
 ModbusBridgeW5100TCPDevice TcpDevice;
 
