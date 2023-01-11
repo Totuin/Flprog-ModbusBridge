@@ -2,40 +2,14 @@
 #include "Arduino.h"
 #include "flprogModbusUtilites.h"
 
-class ModbusBridgeTCPDevice
-{
-public:
-    virtual void begin(bool mode){};
-    virtual byte available() { return 0; };
-    virtual byte read() { return 0; };
-    virtual bool connected() { return false; };
-    virtual void stop(){};
-    virtual void connect(bool mode){};
-    virtual byte write(byte buffer[], byte size) { return 0; };
-    bool setPort(int port);
-    virtual void restartServer(bool mode){};
-    bool setRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth);
-    virtual void print(String data);
-
-protected:
-    int tcpPort = 502;
-    byte ipFirst;
-    byte ipSecond;
-    byte ipThird;
-    byte ipFourth;
-
-private:
-    bool compareRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth);
-};
-
 class ModbusBridge
 {
 public:
     virtual void pool();
-    void setTCPDevice(ModbusBridgeTCPDevice *device);
+    void setTCPDevice(FLProgTcpDevice *device);
     void setRTUDevice(FLProgUart *device);
     void setTCPPort(int port);
-    void setTCPRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth);
+    void setTCPRemoteIp(byte newIpFirst, byte newIpSecond, byte newIpThird, byte newIpFourth);
     void setRtuPortSpeed(byte speed);
     byte getRtuPortSpeed() { return rtuDevice->getPortSpeed(); };
     void setRtuPortDataBits(byte dataBits);
@@ -59,7 +33,7 @@ protected:
     virtual void sendTCPBuffer(){};
     void onPeDePin();
     void offPeDePin();
-    ModbusBridgeTCPDevice *tcpDevice;
+    FLProgTcpDevice *tcpDevice;
     FLProgUart *rtuDevice;
     bool isServer = true;
     byte pinPeDe = 200;
@@ -70,8 +44,14 @@ protected:
     unsigned long startT35;
     unsigned long startSendTime;
     int timeOfSend;
+    bool compareRemoteIp(byte newIpFirst, byte newIpSecond, byte newIpThird, byte newIpFourth);
+    byte ipFirst = 0;
+    byte ipSecond = 0;
+    byte ipThird = 0;
+    byte ipFourth = 0;
 
 private:
+    
 };
 
 class ModbusTcpBridge : public ModbusBridge

@@ -1,53 +1,27 @@
 #include "flprogModbusBridge.h"
 
-bool ModbusBridgeTCPDevice::setPort(int port)
+bool ModbusBridge::compareRemoteIp(byte newIpFirst, byte newIpSecond, byte newIpThird, byte newIpFourth)
 {
-    if (port == tcpPort)
+    if (this->ipFirst != newIpFirst)
     {
         return false;
     }
-
-    tcpPort = port;
-    return true;
-}
-
-bool ModbusBridgeTCPDevice::setRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth)
-{
-
-    if (compareRemoteIp(ipFirst, ipSecond, ipThird, ipFourth))
+    if (this->ipSecond != newIpSecond)
     {
         return false;
     }
-    this->ipFirst = ipFirst;
-    this->ipSecond = ipSecond;
-    this->ipThird = ipThird;
-    this->ipFourth = ipFourth;
-    return true;
-}
-
-bool ModbusBridgeTCPDevice::compareRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth)
-{
-    if (this->ipFirst != ipFirst)
+    if (this->ipThird != newIpThird)
     {
         return false;
     }
-    if (this->ipSecond != ipSecond)
-    {
-        return false;
-    }
-    if (this->ipThird != ipThird)
-    {
-        return false;
-    }
-    if (this->ipFourth != ipFourth)
+    if (this->ipFourth != newIpFourth)
     {
         return false;
     }
     return true;
 }
 
-// ModbusBridge******************
-void ModbusBridge::setTCPDevice(ModbusBridgeTCPDevice *device)
+void ModbusBridge::setTCPDevice(FLProgTcpDevice *device)
 {
     tcpDevice = device;
 }
@@ -134,16 +108,20 @@ void ModbusBridge::begin()
         pinMode(pinPeDe, OUTPUT);
         digitalWrite(pinPeDe, LOW);
     }
-    tcpDevice->begin(isServer);
+    if (isServer)
+    {
+        tcpDevice->beServer();
+    }
+    else
+    {
+        tcpDevice->beClient();
+    }
+    tcpDevice->begin();
 }
 
 void ModbusBridge::setTCPPort(int port)
 {
-    if (!(tcpDevice->setPort(port)))
-    {
-        return;
-    }
-    tcpDevice->restartServer(isServer);
+    tcpDevice->setPort(port);
 }
 
 void ModbusBridge::setRtuPortSpeed(byte speed)
@@ -173,7 +151,7 @@ void ModbusBridge::byServer()
         return;
     }
     isServer = true;
-    tcpDevice->restartServer(isServer);
+    tcpDevice->beServer();
 }
 
 void ModbusBridge::byClient()
@@ -183,16 +161,20 @@ void ModbusBridge::byClient()
         return;
     }
     isServer = false;
-    tcpDevice->restartServer(isServer);
+    tcpDevice->beClient();
 }
 
-void ModbusBridge::setTCPRemoteIp(byte ipFirst, byte ipSecond, byte ipThird, byte ipFourth)
+void ModbusBridge::setTCPRemoteIp(byte newIpFirst, byte newIpSecond, byte newIpThird, byte newIpFourth)
 {
-    if (!tcpDevice->setRemoteIp(ipFirst, ipSecond, ipThird, ipFourth))
+    if (compareRemoteIp(newIpFirst, newIpSecond, newIpThird, newIpFourth))
     {
         return;
     }
-    tcpDevice->restartServer(isServer);
+    ipFirst = newIpFirst;
+    ipSecond = newIpSecond;
+    ipThird = newIpThird;
+    ipFourth = newIpFourth;
+    tcpDevice->restart();
 }
 
 void ModbusBridge::rtuPool()
@@ -238,7 +220,7 @@ long ModbusBridge::t35TimeForSpeed()
 // ModbusTcpBridge******
 void ModbusTcpBridge::tcpPool()
 {
-    tcpDevice->connect(isServer);
+    tcpDevice->connect(ipFirst, ipSecond, ipThird, ipFourth);
 
     if (!tcpDevice->connected())
     {
@@ -269,7 +251,7 @@ void ModbusTcpBridge::tcpPool()
 
 void ModbusTcpBridge::sendTCPBuffer()
 {
-    tcpDevice->connect(isServer);
+    tcpDevice->connect(ipFirst, ipSecond, ipThird, ipFourth);
     if (!tcpDevice->connected())
     {
         return;
@@ -285,7 +267,7 @@ void ModbusTcpBridge::sendTCPBuffer()
 // ModbusRtuOverTcpBridge*****************
 void ModbusRtuOverTcpBridge::tcpPool()
 {
-    tcpDevice->connect(isServer);
+    tcpDevice->connect(ipFirst, ipSecond, ipThird, ipFourth);
 
     if (!tcpDevice->connected())
     {
@@ -308,7 +290,7 @@ void ModbusRtuOverTcpBridge::tcpPool()
 
 void ModbusRtuOverTcpBridge::sendTCPBuffer()
 {
-    tcpDevice->connect(isServer);
+    tcpDevice->connect(ipFirst, ipSecond, ipThird, ipFourth);
     if (!tcpDevice->connected())
     {
         return;
@@ -330,7 +312,7 @@ void ModbusKasCadaCloudTcpBridge::pool()
         }
         else
         {
-            tcpDevice->connect(false);
+            tcpDevice->connect(ipFirst, ipSecond, ipThird, ipFourth);
             return;
         }
     }
@@ -345,26 +327,29 @@ void ModbusKasCadaCloudTcpBridge::pool()
 void ModbusKasCadaCloudTcpBridge::setKaScadaCloudIp(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet)
 {
     isServer = false;
-    if (!tcpDevice->setRemoteIp(first_octet, second_octet, third_octet, fourth_octet))
+    tcpDevice->beClient();
+    if (compareRemoteIp(first_octet, second_octet, third_octet, fourth_octet))
     {
         return;
     }
-    tcpDevice->restartServer(false);
+    ipFirst = first_octet;
+    ipSecond = second_octet;
+    ipThird = third_octet;
+    ipFourth = fourth_octet;
+    tcpDevice->restart();
 }
 
 void ModbusKasCadaCloudTcpBridge::setKaScadaCloudPort(int port)
 {
     isServer = false;
-    if (!(tcpDevice->setPort(port)))
-    {
-        return;
-    }
-    tcpDevice->restartServer(false);
+    tcpDevice->beClient();
+    tcpDevice->setPort(port);
 }
 
 void ModbusKasCadaCloudTcpBridge::setKaScadaCloudDevceId(String id)
 {
     isServer = false;
+    tcpDevice->beClient();
     if (deniceId.equals(id))
 
     {
@@ -377,7 +362,8 @@ void ModbusKasCadaCloudTcpBridge::setKaScadaCloudDevceId(String id)
 void ModbusKasCadaCloudTcpBridge::tcpPool()
 {
     isServer = false;
-    tcpDevice->connect(false);
+    tcpDevice->beClient();
+    tcpDevice->connect(ipFirst, ipSecond, ipThird, ipFourth);
 
     if (!tcpDevice->connected())
     {
@@ -409,7 +395,8 @@ void ModbusKasCadaCloudTcpBridge::tcpPool()
 void ModbusKasCadaCloudTcpBridge::sendTCPBuffer()
 {
     isServer = false;
-    tcpDevice->connect(false);
+    tcpDevice->beClient();
+    tcpDevice->connect(ipFirst, ipSecond, ipThird, ipFourth);
     if (!tcpDevice->connected())
     {
         return;
@@ -425,11 +412,12 @@ void ModbusKasCadaCloudTcpBridge::sendTCPBuffer()
 void ModbusKasCadaCloudTcpBridge::begin()
 {
     isServer = false;
+    tcpDevice->beClient();
     rtuDevice->begin();
     if (!(pinPeDe == 200))
     {
         pinMode(pinPeDe, OUTPUT);
         digitalWrite(pinPeDe, LOW);
     }
-    tcpDevice->begin(false);
+    tcpDevice->begin();
 }
